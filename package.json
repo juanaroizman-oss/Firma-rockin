@@ -1,0 +1,14 @@
+{
+  "name": "firma-rockin",
+  "version": "1.0.0",
+  "description": "Generador de firmas de correo ROCKIN MEDIA",
+  "dependencies": {
+    "@sparticuz/chromium": "^123.0.0",
+    "canvas": "^2.11.2",
+    "gifencoder": "^2.0.1",
+    "puppeteer-core": "^22.0.0"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Firma · ROCKIN MEDIA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: #0a0a0a;
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header img {
+      width: 120px;
+      margin-bottom: 16px;
+    }
+
+    header h1 {
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #888;
+    }
+
+    .card {
+      background: #141414;
+      border: 0.5px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 28px 32px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-grid.full { grid-template-columns: 1fr; }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .field input {
+      width: 100%;
+      background: #0a0a0a;
+      border: 0.5px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      color: #f0f0f0;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus { border-color: #2de2fb; }
+    .field input::placeholder { color: #333; }
+
+    .preview-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 10px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-gif {
+      background: linear-gradient(to right, #2de2fb, #3be692);
+      color: #0a0a0a;
+    }
+
+    .btn-html {
+      background: #1e1e1e;
+      color: #888;
+      border: 0.5px solid #2a2a2a;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .status {
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: #555;
+      min-height: 20px;
+      margin-top: 12px;
+    }
+
+    .status.loading { color: #2de2fb; }
+    .status.success { color: #3be692; }
+    .status.error { color: #ff5a5a; }
+
+    .instructions {
+      background: #0f0f0f;
+      border: 0.5px solid #1e1e1e;
+      border-radius: 12px;
+      padding: 20px 24px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .instructions h2 {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #444;
+      margin-bottom: 16px;
+    }
+
+    .step {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 14px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(to bottom right, #2de2fb22, #3be69222);
+      border: 0.5px solid #2de2fb44;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #2de2fb;
+      flex-shrink: 0;
+    }
+
+    .step p { font-size: 13px; color: #666; line-height: 1.6; }
+    .step strong { color: #999; font-weight: 500; }
+
+    footer {
+      margin-top: 40px;
+      font-size: 11px;
+      color: #333;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 480px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="https://i.ibb.co/YT2xt5bK/ROCKIN-2026.gif" alt="ROCKIN MEDIA" />
+    <h1>Generador de firma de correo</h1>
+  </header>
+
+  <div class="card">
+    <p class="card-title">Tus datos</p>
+    <div class="form-grid">
+      <div class="field">
+        <label>Nombre</label>
+        <input type="text" id="nombre" placeholder="Ana" oninput="updatePreview()" />
+      </div>
+      <div class="field">
+        <label>Apellidos</label>
+        <input type="text" id="apellidos" placeholder="García López" oninput="updatePreview()" />
+      </div>
+    </div>
+    <div class="form-grid full">
+      <div class="field">
+        <label>Puesto / Cargo</label>
+        <input type="text" id="cargo" placeholder="Marketing Manager" oninput="updatePreview()" />
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Previsualización</p>
+    <div class="preview-card">
+      <table id="preview-table" style="table-layout:fixed;border-collapse:collapse;width:560px;font-family:Montserrat,Arial,sans-serif;">
+        <tbody>
+          <tr>
+            <td style="width:100px;padding-right:10px;">
+              <img src="https://i.ibb.co/YT2xt5bK/ROCKIN-2026.gif" width="100" style="display:block;border:0;max-width:100px;" />
+            </td>
+            <td style="width:260px;padding:0;text-align:left;vertical-align:middle;">
+              <div id="prev-nombre" style="font-size:22px;font-weight:600;line-height:1.4;color:#111;">Nombre Apellidos</div>
+              <div id="prev-cargo" style="font-size:11px;font-weight:400;text-transform:uppercase;letter-spacing:3px;display:inline-block;background:linear-gradient(to right,#2de2fb,#3be692);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Puesto / Cargo</div>
+            </td>
+            <td style="width:1px;padding:0;">
+              <table style="width:1px;border-collapse:collapse;">
+                <tr><td style="width:1px;background:linear-gradient(to bottom,#2de2fb,#3be692);height:100px;"></td></tr>
+              </table>
+            </td>
+            <td style="width:180px;padding:0 0 0 20px;text-align:left;">
+              <table style="border-collapse:collapse;">
+                <tr>
+                  <td style="padding-right:8px;"><img src="https://i.imgur.com/hCYpS53.png" alt="Google Partner" width="60" /></td>
+                  <td style="padding-right:8px;"><img src="https://i.imgur.com/9EtzHgO.png" alt="HubSpot Partner" width="60" /></td>
+                  <td><img src="https://i.ibb.co/93B8ccgn/Meta-Certified.png" alt="Meta Certified" width="60"/></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4" style="padding-top:8px;font-size:8px;line-height:11px;color:#aaa;">
+              <p style="margin:0;">© ROCKIN MEDIA, S.L. | B87928743 – Calle de Marcenado 37, 28002, Madrid | <a href="https://rockinmedia.es/aviso-legal" style="color:#3046ed;">Aviso legal</a></p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="actions" style="margin-top:20px;">
+      <button class="btn btn-gif" id="btn-gif" onclick="generateGIF()">Descargar GIF</button>
+      <button class="btn btn-html" onclick="copyHTML()">Copiar HTML</button>
+    </div>
+    <p class="status" id="status"></p>
+  </div>
+
+  <div class="instructions">
+    <h2>Cómo usar tu firma</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <p>Descarga tu firma en <strong>GIF</strong> o copia el <strong>HTML</strong>.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <p><strong>Gmail:</strong> Ajustes → Ver todos los ajustes → Firma → Insertar imagen → Subir el GIF.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <p><strong>Outlook:</strong> Archivo → Opciones → Correo → Firmas → Nueva → pegar el HTML.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <p><strong>Apple Mail:</strong> Mail → Preferencias → Firmas → pegar el HTML.</p>
+    </div>
+  </div>
+
+  <footer>rockin media · firma corporativa</footer>
+
+  <script>
+    function updatePreview() {
+      const n = document.getElementById('nombre').value.trim() || 'Nombre';
+      const a = document.getElementById('apellidos').value.trim() || 'Apellidos';
+      const c = document.getElementById('cargo').value.trim() || 'Puesto / Cargo';
+      document.getElementById('prev-nombre').textContent = n + ' ' + a;
+      document.getElementById('prev-cargo').textContent = c;
+    }
+
+    function getHTML() {
+      const n = document.getElementById('nombre').value.trim();
+      const a = document.getElementById('apellidos').value.trim();
+      const c = document.getElementById('cargo').value.trim();
+      return `<table style="table-layout:fixed;border-collapse:collapse;width:600px;font-family:Montserrat,Arial,sans-serif;"><tbody><tr><td style="width:100px;padding-right:10px;"><img src="https://i.ibb.co/YT2xt5bK/ROCKIN-2026.gif" width="100" style="display:block;border:0;max-width:100px;" /></td><td style="width:300px;padding:0;text-align:left;vertical-align:middle;"><div style="font-size:24px;font-weight:600;line-height:1.4;color:#111;">${n} ${a}</div><div style="font-size:12px;font-weight:400;text-transform:uppercase;letter-spacing:3px;display:inline-block;background:linear-gradient(to right,#2de2fb,#3be692);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">${c}</div></td><td style="width:1px;padding:0;"><table style="width:1px;border-collapse:collapse;"><tr><td style="width:1px;background:linear-gradient(to bottom,#2de2fb,#3be692);height:120px;"></td></tr></table></td><td style="width:200px;padding:0 0 0 40px;text-align:left;"><table style="border-collapse:collapse;"><tr><td style="padding-right:20px;"><img src="https://i.imgur.com/hCYpS53.png" alt="Google Partner" width="80" /></td><td><img src="https://i.imgur.com/9EtzHgO.png" alt="HubSpot Partner" width="80" /></td><td><img src="https://i.ibb.co/93B8ccgn/Meta-Certified.png" alt="Meta Certified" width="80"/></td></tr></table></td></tr><tr><td colspan="4" style="padding-top:10px;font-size:9px;line-height:12px;color:#888;">© ROCKIN MEDIA, S.L. | B87928743 – Calle de Marcenado 37, 28002, Madrid</td></tr></tbody></table>`;
+    }
+
+    function copyHTML() {
+      const html = getHTML();
+      navigator.clipboard.writeText(html).then(() => {
+        setStatus('¡HTML copiado!', 'success');
+      });
+    }
+
+    async function generateGIF() {
+      const n = document.getElementById('nombre').value.trim();
+      const a = document.getElementById('apellidos').value.trim();
+      const c = document.getElementById('cargo').value.trim();
+
+      if (!n || !a || !c) {
+        setStatus('Por favor, rellena todos los campos.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-gif');
+      btn.disabled = true;
+      setStatus('Generando tu GIF...', 'loading');
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre: n, apellidos: a, cargo: c })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'Error desconocido');
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `firma-${n}-${a}.gif`;
+        link.click();
+        URL.revokeObjectURL(url);
+
+        setStatus('¡GIF descargado!', 'success');
+      } catch (e) {
+        setStatus('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function setStatus(msg, type) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.className = 'status ' + (type || '');
+      if (type === 'success') setTimeout(() => { el.textContent = ''; el.className = 'status'; }, 3000);
+    }
+  </script>
+</body>
+</html>
