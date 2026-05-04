@@ -128,7 +128,7 @@
       navigator.clipboard.writeText(getHTML()).then(() => setStatus('¡HTML copiado!', 'success'));
     }
 
-    // Convierte RGBA a paleta de 256 colores y genera GIF con omggif
+    // Convierte canvas a GIF usando omggif
     function canvasToGIF(canvas) {
       return new Promise((resolve) => {
         const ctx = canvas.getContext('2d');
@@ -137,10 +137,10 @@
         const imageData = ctx.getImageData(0, 0, w, h);
         const pixels = imageData.data;
 
-        // Construir paleta y datos indexados
+        // Construir paleta como array de 0xRRGGBB (formato que espera omggif)
         const colorMap = new Map();
-        const palette = [[255,255,255]]; // fondo blanco primero
-        colorMap.set('255,255,255', 0);
+        const palette = [0xffffff]; // índice 0 = blanco
+        colorMap.set(0xffffff, 0);
 
         const indexed = new Uint8Array(w * h);
 
@@ -148,36 +148,38 @@
           const r = pixels[i*4];
           const g = pixels[i*4+1];
           const b = pixels[i*4+2];
-          const key = `${r},${g},${b}`;
-          if (!colorMap.has(key)) {
+          const hex = (r << 16) | (g << 8) | b;
+
+          if (!colorMap.has(hex)) {
             if (palette.length < 256) {
-              colorMap.set(key, palette.length);
-              palette.push([r, g, b]);
+              colorMap.set(hex, palette.length);
+              palette.push(hex);
             } else {
-              // Color más cercano en paleta
+              // Buscar color más cercano
               let best = 0, bestDist = Infinity;
               for (let p = 0; p < palette.length; p++) {
-                const d = (r-palette[p][0])**2 + (g-palette[p][1])**2 + (b-palette[p][2])**2;
+                const pr = (palette[p] >> 16) & 0xff;
+                const pg = (palette[p] >> 8) & 0xff;
+                const pb = palette[p] & 0xff;
+                const d = (r-pr)**2 + (g-pg)**2 + (b-pb)**2;
                 if (d < bestDist) { bestDist = d; best = p; }
               }
               indexed[i] = best;
               continue;
             }
           }
-          indexed[i] = colorMap.get(key);
+          indexed[i] = colorMap.get(hex);
         }
 
-        // Pad paleta a potencia de 2 exacta (requerido por omggif)
+        // Paleta debe ser potencia de 2 (requerido por omggif)
         let pow2 = 2;
         while (pow2 < palette.length) pow2 *= 2;
         pow2 = Math.min(pow2, 256);
-        while (palette.length < pow2) palette.push([0, 0, 0]);
+        while (palette.length < pow2) palette.push(0x000000);
 
         const buf = new Uint8Array(w * h * 10);
-        const gf = new GifWriter(buf, w, h, { loop: 0, palette_size: pow2 });
-
-        const flatPalette = palette.flat();
-        gf.addFrame(0, 0, w, h, indexed, { palette: flatPalette, palette_size: pow2, delay: 0 });
+        const gf = new GifWriter(buf, w, h, { loop: 0, palette: palette });
+        gf.addFrame(0, 0, w, h, indexed, { delay: 0 });
 
         const gifData = buf.slice(0, gf.end());
         const blob = new Blob([gifData], { type: 'image/gif' });
