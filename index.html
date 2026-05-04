@@ -6,6 +6,7 @@
   <title>Generador de Firma · ROCKIN MEDIA</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/omggif@1.0.10/omggif.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Montserrat', Arial, sans-serif; background: #0a0a0a; color: #f0f0f0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
@@ -39,7 +40,7 @@
     .step p { font-size: 13px; color: #666; line-height: 1.6; }
     .step strong { color: #999; font-weight: 500; }
     footer { margin-top: 40px; font-size: 11px; color: #333; letter-spacing: 2px; text-transform: uppercase; }
-    #firma-render { position: fixed; left: -9999px; top: 0; background: white; padding: 20px; font-family: Montserrat, Arial, sans-serif; }
+    #firma-render { position: fixed; left: -9999px; top: 0; background: white; padding: 20px; font-family: Arial, sans-serif; }
     @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .actions { flex-direction: column; } }
   </style>
 </head>
@@ -64,33 +65,33 @@
   <div class="card">
     <p class="card-title">Previsualización</p>
     <div class="preview-card">
-      <table id="preview-table" style="table-layout:fixed;border-collapse:collapse;width:580px;font-family:Montserrat,Arial,sans-serif;">
+      <table style="table-layout:fixed;border-collapse:collapse;width:580px;font-family:Montserrat,Arial,sans-serif;">
         <tbody>
           <tr>
-            <td style="width:100px;padding-right:10px;"><img src="https://i.ibb.co/YT2xt5bK/ROCKIN-2026.gif" width="100" style="display:block;border:0;max-width:100px;" /></td>
+            <td style="width:100px;padding-right:10px;"><img src="https://i.ibb.co/YT2xt5bK/ROCKIN-2026.gif" width="100" style="display:block;border:0;" /></td>
             <td style="width:270px;padding:0;text-align:left;vertical-align:middle;">
               <div id="prev-nombre" style="font-size:22px;font-weight:600;line-height:1.4;color:#111;">Nombre Apellidos</div>
-              <div id="prev-cargo" style="font-size:11px;font-weight:400;text-transform:uppercase;letter-spacing:3px;display:inline-block;background:linear-gradient(to right,#2de2fb,#3be692);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Puesto / Cargo</div>
+              <div id="prev-cargo" style="font-size:11px;text-transform:uppercase;letter-spacing:3px;display:inline-block;background:linear-gradient(to right,#2de2fb,#3be692);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Puesto / Cargo</div>
             </td>
             <td style="width:1px;padding:0;"><table style="width:1px;border-collapse:collapse;"><tr><td style="width:1px;background:linear-gradient(to bottom,#2de2fb,#3be692);height:100px;"></td></tr></table></td>
-            <td style="width:190px;padding:0 0 0 20px;text-align:left;">
+            <td style="width:190px;padding:0 0 0 20px;">
               <table style="border-collapse:collapse;"><tr>
-                <td style="padding-right:8px;"><img src="https://i.imgur.com/hCYpS53.png" alt="Google Partner" width="60" /></td>
-                <td style="padding-right:8px;"><img src="https://i.imgur.com/9EtzHgO.png" alt="HubSpot Partner" width="60" /></td>
-                <td><img src="https://i.ibb.co/93B8ccgn/Meta-Certified.png" alt="Meta Certified" width="60"/></td>
+                <td style="padding-right:8px;"><img src="https://i.imgur.com/hCYpS53.png" width="60" /></td>
+                <td style="padding-right:8px;"><img src="https://i.imgur.com/9EtzHgO.png" width="60" /></td>
+                <td><img src="https://i.ibb.co/93B8ccgn/Meta-Certified.png" width="60"/></td>
               </tr></table>
             </td>
           </tr>
           <tr>
-            <td colspan="4" style="padding-top:8px;font-size:8px;line-height:11px;color:#aaa;">
-              <p style="margin:0;">La información contenida en este mensaje es confidencial. © ROCKIN MEDIA, S.L. | B87928743 – Calle de Marcenado 37, 28002, Madrid | <a href="https://rockinmedia.es/aviso-legal" style="color:#3046ed;">Aviso legal</a></p>
+            <td colspan="4" style="padding-top:8px;font-size:8px;color:#aaa;">
+              © ROCKIN MEDIA, S.L. | B87928743 – Calle de Marcenado 37, 28002, Madrid | <a href="https://rockinmedia.es/aviso-legal" style="color:#3046ed;">Aviso legal</a>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="actions">
-      <button class="btn btn-gif" id="btn-gif" onclick="generateImage()">Descargar imagen</button>
+      <button class="btn btn-gif" id="btn-gif" onclick="generateGIF()">Descargar GIF</button>
       <button class="btn btn-html" onclick="copyHTML()">Copiar HTML</button>
     </div>
     <p class="status" id="status"></p>
@@ -98,8 +99,8 @@
 
   <div class="instructions">
     <h2>Cómo usar tu firma</h2>
-    <div class="step"><div class="step-num">1</div><p>Rellena tus datos y descarga la <strong>imagen PNG</strong> o copia el <strong>HTML</strong>.</p></div>
-    <div class="step"><div class="step-num">2</div><p><strong>Gmail:</strong> Ajustes → Ver todos los ajustes → Firma → Insertar imagen → Subir la imagen.</p></div>
+    <div class="step"><div class="step-num">1</div><p>Rellena tus datos y descarga el <strong>GIF</strong> o copia el <strong>HTML</strong>.</p></div>
+    <div class="step"><div class="step-num">2</div><p><strong>Gmail:</strong> Ajustes → Ver todos los ajustes → Firma → Insertar imagen → Subir el GIF.</p></div>
     <div class="step"><div class="step-num">3</div><p><strong>Outlook:</strong> Archivo → Opciones → Correo → Firmas → Nueva → pegar el HTML.</p></div>
     <div class="step"><div class="step-num">4</div><p><strong>Apple Mail:</strong> Mail → Preferencias → Firmas → pegar el HTML.</p></div>
   </div>
@@ -127,7 +128,61 @@
       navigator.clipboard.writeText(getHTML()).then(() => setStatus('¡HTML copiado!', 'success'));
     }
 
-    async function generateImage() {
+    // Convierte RGBA a paleta de 256 colores y genera GIF con omggif
+    function canvasToGIF(canvas) {
+      return new Promise((resolve) => {
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        const imageData = ctx.getImageData(0, 0, w, h);
+        const pixels = imageData.data;
+
+        // Construir paleta y datos indexados
+        const colorMap = new Map();
+        const palette = [[255,255,255]]; // fondo blanco primero
+        colorMap.set('255,255,255', 0);
+
+        const indexed = new Uint8Array(w * h);
+
+        for (let i = 0; i < w * h; i++) {
+          const r = pixels[i*4];
+          const g = pixels[i*4+1];
+          const b = pixels[i*4+2];
+          const key = `${r},${g},${b}`;
+          if (!colorMap.has(key)) {
+            if (palette.length < 256) {
+              colorMap.set(key, palette.length);
+              palette.push([r, g, b]);
+            } else {
+              // Color más cercano en paleta
+              let best = 0, bestDist = Infinity;
+              for (let p = 0; p < palette.length; p++) {
+                const d = (r-palette[p][0])**2 + (g-palette[p][1])**2 + (b-palette[p][2])**2;
+                if (d < bestDist) { bestDist = d; best = p; }
+              }
+              indexed[i] = best;
+              continue;
+            }
+          }
+          indexed[i] = colorMap.get(key);
+        }
+
+        // Pad palette a potencia de 2
+        while (palette.length < 256) palette.push([0,0,0]);
+
+        const buf = new Uint8Array(w * h * 10);
+        const gf = new GifWriter(buf, w, h, { loop: 0 });
+
+        const flatPalette = palette.flat();
+        gf.addFrame(0, 0, w, h, indexed, { palette: flatPalette, delay: 0 });
+
+        const gifData = buf.slice(0, gf.end());
+        const blob = new Blob([gifData], { type: 'image/gif' });
+        resolve(blob);
+      });
+    }
+
+    async function generateGIF() {
       const n = document.getElementById('nombre').value.trim();
       const a = document.getElementById('apellidos').value.trim();
       const c = document.getElementById('cargo').value.trim();
@@ -135,7 +190,7 @@
 
       const btn = document.getElementById('btn-gif');
       btn.disabled = true;
-      setStatus('Generando imagen...', 'loading');
+      setStatus('Capturando firma...', 'loading');
 
       try {
         const render = document.getElementById('firma-render');
@@ -143,54 +198,52 @@
           <table style="table-layout:fixed;border-collapse:collapse;width:600px;font-family:Arial,sans-serif;">
             <tbody><tr>
               <td style="width:100px;padding-right:10px;">
-                <img crossorigin="anonymous" src="https://i.ibb.co/YT2xt5bK/ROCKIN-2026.gif?t=${Date.now()}" width="100" style="display:block;" />
+                <img crossorigin="anonymous" src="https://i.ibb.co/YT2xt5bK/ROCKIN-2026.gif" width="100" style="display:block;" />
               </td>
               <td style="width:300px;padding:0;vertical-align:middle;">
-                <div style="font-size:24px;font-weight:600;color:#111;line-height:1.4;">${n} ${a}</div>
+                <div style="font-size:24px;font-weight:700;color:#111;line-height:1.4;">${n} ${a}</div>
                 <div style="font-size:12px;text-transform:uppercase;letter-spacing:3px;color:#2de2fb;">${c}</div>
               </td>
-              <td style="width:2px;padding:0;">
-                <div style="width:2px;height:80px;background:#2de2fb;"></div>
-              </td>
+              <td style="width:2px;padding:0;background:linear-gradient(to bottom,#2de2fb,#3be692);"></td>
               <td style="width:200px;padding:0 0 0 30px;">
                 <table style="border-collapse:collapse;"><tr>
-                  <td style="padding-right:10px;"><img crossorigin="anonymous" src="https://i.imgur.com/hCYpS53.png?t=${Date.now()}" width="70" /></td>
-                  <td style="padding-right:10px;"><img crossorigin="anonymous" src="https://i.imgur.com/9EtzHgO.png?t=${Date.now()}" width="70" /></td>
-                  <td><img crossorigin="anonymous" src="https://i.ibb.co/93B8ccgn/Meta-Certified.png?t=${Date.now()}" width="70" /></td>
+                  <td style="padding-right:10px;"><img crossorigin="anonymous" src="https://i.imgur.com/hCYpS53.png" width="70" /></td>
+                  <td style="padding-right:10px;"><img crossorigin="anonymous" src="https://i.imgur.com/9EtzHgO.png" width="70" /></td>
+                  <td><img crossorigin="anonymous" src="https://i.ibb.co/93B8ccgn/Meta-Certified.png" width="70" /></td>
                 </tr></table>
               </td>
             </tr>
             <tr><td colspan="4" style="padding-top:8px;font-size:8px;color:#888;">
               © ROCKIN MEDIA, S.L. | B87928743 – Calle de Marcenado 37, 28002, Madrid
-            </td></tr>
-            </tbody>
+            </td></tr></tbody>
           </table>`;
 
         await new Promise(r => setTimeout(r, 2000));
+        setStatus('Generando GIF...', 'loading');
 
         const canvas = await html2canvas(render, {
           backgroundColor: '#ffffff',
-          scale: 2,
+          scale: 1,
           useCORS: true,
           allowTaint: true,
           logging: false,
         });
 
-        canvas.toBlob((blob) => {
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `firma-${n}-${a}.png`;
-          link.click();
-          URL.revokeObjectURL(url);
-          setStatus('¡Imagen descargada!', 'success');
-          btn.disabled = false;
-          render.innerHTML = '';
-        }, 'image/png');
+        render.innerHTML = '';
+
+        const blob = await canvasToGIF(canvas);
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `firma-${n}-${a}.gif`;
+        link.click();
+        URL.revokeObjectURL(url);
+        setStatus('¡GIF descargado!', 'success');
 
       } catch (e) {
         console.error(e);
         setStatus('Error: ' + e.message, 'error');
+      } finally {
         btn.disabled = false;
       }
     }
