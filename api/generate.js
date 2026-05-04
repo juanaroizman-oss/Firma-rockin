@@ -45,11 +45,22 @@ const SIGNATURE_HTML = (nombre, apellidos, cargo) => `<!DOCTYPE html>
 </body>
 </html>`;
 
-module.exports = async (req, res) => {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+exports.handler = async (event) => {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+  }
 
-  const { nombre, apellidos, cargo } = req.body;
-  if (!nombre || !apellidos || !cargo) return res.status(400).json({ error: 'Faltan campos' });
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch {
+    return { statusCode: 400, body: JSON.stringify({ error: 'JSON inválido' }) };
+  }
+
+  const { nombre, apellidos, cargo } = body;
+  if (!nombre || !apellidos || !cargo) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Faltan campos' }) };
+  }
 
   let browser;
   try {
@@ -85,13 +96,19 @@ module.exports = async (req, res) => {
     await new Promise(resolve => setTimeout(resolve, 200));
     const gifBuffer = Buffer.concat(chunks);
 
-    res.setHeader('Content-Type', 'image/gif');
-    res.setHeader('Content-Disposition', `attachment; filename="firma-${nombre}-${apellidos}.gif"`);
-    res.send(gifBuffer);
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'image/gif',
+        'Content-Disposition': `attachment; filename="firma-${nombre}-${apellidos}.gif"`,
+      },
+      body: gifBuffer.toString('base64'),
+      isBase64Encoded: true,
+    };
 
   } catch (err) {
     if (browser) await browser.close();
     console.error(err);
-    res.status(500).json({ error: 'Error generando el GIF', detail: err.message });
+    return { statusCode: 500, body: JSON.stringify({ error: 'Error generando el GIF', detail: err.message }) };
   }
 };
