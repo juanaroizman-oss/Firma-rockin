@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer-core');
 const chromium = require('@sparticuz/chromium');
 const GIFEncoder = require('gifencoder');
 const { createCanvas, loadImage } = require('canvas');
- 
+
 const SIGNATURE_HTML = (nombre, apellidos, cargo) => `<!DOCTYPE html>
 <html>
 <head>
@@ -44,59 +44,68 @@ const SIGNATURE_HTML = (nombre, apellidos, cargo) => `<!DOCTYPE html>
 </table>
 </body>
 </html>`;
- 
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
- 
+
   const { nombre, apellidos, cargo } = req.body;
   if (!nombre || !apellidos || !cargo) return res.status(400).json({ error: 'Faltan campos' });
- 
+
   let browser;
   try {
+    const executablePath = await chromium.executablePath();
+
     browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [
+        ...chromium.args,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--single-process',
+      ],
       defaultViewport: { width: 640, height: 400 },
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      executablePath,
+      headless: 'new',
     });
- 
+
     const page = await browser.newPage();
     await page.setContent(SIGNATURE_HTML(nombre, apellidos, cargo), { waitUntil: 'networkidle0', timeout: 20000 });
     const height = await page.evaluate(() => document.body.scrollHeight);
     await page.setViewport({ width: 640, height: Math.max(height, 200) });
     const screenshot = await page.screenshot({ type: 'png' });
     await browser.close();
- 
+    browser = null;
+
     const img = await loadImage(screenshot);
     const w = img.width;
     const h = img.height;
- 
+
     const encoder = new GIFEncoder(w, h);
     const chunks = [];
     encoder.createReadStream().on('data', chunk => chunks.push(chunk));
- 
+
     encoder.start();
     encoder.setRepeat(0);
     encoder.setDelay(0);
     encoder.setQuality(5);
- 
+
     const canvas = createCanvas(w, h);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
     encoder.addFrame(ctx);
     encoder.finish();
- 
+
     await new Promise(resolve => setTimeout(resolve, 200));
     const gifBuffer = Buffer.concat(chunks);
- 
+
     res.setHeader('Content-Type', 'image/gif');
     res.setHeader('Content-Disposition', `attachment; filename="firma-${nombre}-${apellidos}.gif"`);
     res.send(gifBuffer);
- 
+
   } catch (err) {
     if (browser) await browser.close();
     console.error(err);
     res.status(500).json({ error: 'Error generando el GIF', detail: err.message });
   }
 };
- 
