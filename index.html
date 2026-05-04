@@ -167,14 +167,17 @@
           indexed[i] = colorMap.get(key);
         }
 
-        // Pad palette a potencia de 2
-        while (palette.length < 256) palette.push([0,0,0]);
+        // Pad paleta a potencia de 2 exacta (requerido por omggif)
+        let pow2 = 2;
+        while (pow2 < palette.length) pow2 *= 2;
+        pow2 = Math.min(pow2, 256);
+        while (palette.length < pow2) palette.push([0, 0, 0]);
 
         const buf = new Uint8Array(w * h * 10);
-        const gf = new GifWriter(buf, w, h, { loop: 0 });
+        const gf = new GifWriter(buf, w, h, { loop: 0, palette_size: pow2 });
 
         const flatPalette = palette.flat();
-        gf.addFrame(0, 0, w, h, indexed, { palette: flatPalette, delay: 0 });
+        gf.addFrame(0, 0, w, h, indexed, { palette: flatPalette, palette_size: pow2, delay: 0 });
 
         const gifData = buf.slice(0, gf.end());
         const blob = new Blob([gifData], { type: 'image/gif' });
