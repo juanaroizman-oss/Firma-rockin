@@ -36,8 +36,8 @@ const SIGNATURE_HTML = (nombre, apellidos, cargo) => `<!DOCTYPE html>
       </td>
     </tr>
     <tr>
-      <td colspan="4" style="padding-top:10px;font-size:9px;line-height:12px;color:#888;text-align:left;">
-        <p style="margin:0;">La información contenida en este mensaje es confidencial. © ROCKIN MEDIA, S.L. | B87928743 – Calle de Marcenado 37, 28002, Madrid | <a href="https://rockinmedia.es/aviso-legal" style="color:#3046ed;">Aviso legal</a></p>
+      <td colspan="4" style="padding-top:10px;font-size:9px;line-height:12px;color:#888;">
+        <p style="margin:0;">© ROCKIN MEDIA, S.L. | B87928743 – Calle de Marcenado 37, 28002, Madrid | <a href="https://rockinmedia.es/aviso-legal" style="color:#3046ed;">Aviso legal</a></p>
       </td>
     </tr>
   </tbody>
@@ -53,20 +53,11 @@ module.exports = async (req, res) => {
 
   let browser;
   try {
-    const executablePath = await chromium.executablePath();
-
     browser = await puppeteer.launch({
-      args: [
-        ...chromium.args,
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--single-process',
-      ],
+      args: chromium.args,
       defaultViewport: { width: 640, height: 400 },
-      executablePath,
-      headless: 'new',
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     });
 
     const page = await browser.newPage();
@@ -78,19 +69,14 @@ module.exports = async (req, res) => {
     browser = null;
 
     const img = await loadImage(screenshot);
-    const w = img.width;
-    const h = img.height;
-
-    const encoder = new GIFEncoder(w, h);
+    const encoder = new GIFEncoder(img.width, img.height);
     const chunks = [];
     encoder.createReadStream().on('data', chunk => chunks.push(chunk));
-
     encoder.start();
     encoder.setRepeat(0);
     encoder.setDelay(0);
     encoder.setQuality(5);
-
-    const canvas = createCanvas(w, h);
+    const canvas = createCanvas(img.width, img.height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
     encoder.addFrame(ctx);
