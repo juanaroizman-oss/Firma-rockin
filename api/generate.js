@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer-core');
 const chromium = require('@sparticuz/chromium');
-const GIFEncoder = require('gifencoder');
-const { createCanvas, loadImage } = require('canvas');
+const sharp = require('sharp');
 
 const SIGNATURE_HTML = (nombre, apellidos, cargo) => `<!DOCTYPE html>
 <html>
@@ -51,11 +50,8 @@ exports.handler = async (event) => {
   }
 
   let body;
-  try {
-    body = JSON.parse(event.body);
-  } catch {
-    return { statusCode: 400, body: JSON.stringify({ error: 'JSON inválido' }) };
-  }
+  try { body = JSON.parse(event.body); }
+  catch { return { statusCode: 400, body: JSON.stringify({ error: 'JSON inválido' }) }; }
 
   const { nombre, apellidos, cargo } = body;
   if (!nombre || !apellidos || !cargo) {
@@ -79,22 +75,8 @@ exports.handler = async (event) => {
     await browser.close();
     browser = null;
 
-    const img = await loadImage(screenshot);
-    const encoder = new GIFEncoder(img.width, img.height);
-    const chunks = [];
-    encoder.createReadStream().on('data', chunk => chunks.push(chunk));
-    encoder.start();
-    encoder.setRepeat(0);
-    encoder.setDelay(0);
-    encoder.setQuality(5);
-    const canvas = createCanvas(img.width, img.height);
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-    encoder.addFrame(ctx);
-    encoder.finish();
-
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const gifBuffer = Buffer.concat(chunks);
+    // Convertir PNG a GIF usando sharp (no necesita librerías del sistema)
+    const gifBuffer = await sharp(screenshot).gif().toBuffer();
 
     return {
       statusCode: 200,
